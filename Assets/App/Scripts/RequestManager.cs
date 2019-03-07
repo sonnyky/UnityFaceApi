@@ -14,19 +14,6 @@ public static class RequestManager
         public string userData;
     }
 
-    static IEnumerator Post(string url, string bodyJsonString)
-    {
-        var request = new UnityWebRequest(url, "POST");
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
-        request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        yield return request.SendWebRequest();
-
-        Debug.Log("Status Code: " + request.responseCode);
-    }
-
     public static IEnumerator CreatePersonGroup(string personGroupId, string name, string userData, System.Action<bool> result) {
         string parameters = "?subscription-key=" + Constants.FACE_API_KEY_1;
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + parameters;
@@ -156,7 +143,7 @@ public static class RequestManager
         }
     }
 
-    public static IEnumerator GetPersonListInGroup(string personGroupId, System.Action<bool> result)
+    public static IEnumerator GetPersonListInGroup(string personGroupId, System.Action<string> result)
     {
         string parameters = "?subscription-key=" + Constants.FACE_API_KEY_1;
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/persons" + parameters;
@@ -168,19 +155,19 @@ public static class RequestManager
             if (www.isNetworkError)
             {
                 Debug.Log(" Error: " + www.error);
-                result(false);
+                result(www.error);
             }
             else
             {
                 if (!string.IsNullOrEmpty(www.error))
                 {
                     Debug.Log(www.error);
-                    result(false);
+                    result(www.error);
                 }
                 else
                 {
                     Debug.Log(":\nReceived: " + www.downloadHandler.text);
-                    result(true);
+                    result(www.downloadHandler.text);
                 }
             }
         }
@@ -250,4 +237,121 @@ public static class RequestManager
 
     }
 
+    public static IEnumerator AddFaceToPersonInGroup(string personGroupId, string personId,string pathToImage, string targetFace, System.Action<string> result)
+    {
+        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/persons/" + personId + "/persistedFaces" ;
+        
+        var www = new UnityWebRequest(request, "POST");
+        byte[] bodyRaw = File.ReadAllBytes(pathToImage);
+        www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/octet-stream");
+        www.SetRequestHeader("Ocp-Apim-Subscription-Key", Constants.FACE_API_KEY_1);
+
+        yield return www.SendWebRequest();
+
+        if (www.isNetworkError)
+        {
+            result(www.error);
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(www.error))
+            {
+                result(www.error);
+            }
+            else
+            {
+                result(www.downloadHandler.text);
+            }
+        }
+
+    }
+
+
+    public static IEnumerator TrainPersonGroup(string personGroupId, System.Action<string> result)
+    {
+        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/train";
+
+        var www = new UnityWebRequest(request, "POST");
+       
+        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+        www.SetRequestHeader("Ocp-Apim-Subscription-Key", Constants.FACE_API_KEY_1);
+
+        yield return www.SendWebRequest();
+
+        if (www.isNetworkError)
+        {
+            result(www.error);
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(www.error))
+            {
+                result(www.error);
+            }
+            else
+            {
+                result(www.downloadHandler.text);
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// This method only supports PersonGroupId
+    /// </summary>
+    /// <param name="personGroupId"></param>
+    /// <param name="faceIds"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public static IEnumerator Identify(string personGroupId, FacesBasic.FacesDetectionResponse[] faces, System.Action<string> result)
+    {
+        string request = Constants.FACE_API_ENDPOINT + "/identify";
+
+
+        // Send the detected faces to identify agains the trained images
+        Identify.IdentifyTarget identify = new Identify.IdentifyTarget();
+        identify.faceIds = new string[faces.Length];
+        identify.personGroupId = personGroupId;
+        for (int k = 0; k < faces.Length; k++)
+        {
+            identify.faceIds[k] = faces[k].faceId;
+        }
+        identify.maxNumOfCandidatesReturned = 1;
+        identify.confidenceThreshold = 0.5f;
+
+        string dataJson = JsonUtility.ToJson(identify);
+
+        Debug.Log("dataJson in Identify");
+        Debug.Log(dataJson);
+
+        var www = new UnityWebRequest(request, "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(dataJson);
+        www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+        www.SetRequestHeader("Ocp-Apim-Subscription-Key", Constants.FACE_API_KEY_1);
+
+        yield return www.SendWebRequest();
+
+        if (www.isNetworkError)
+        {
+            result(www.error + " : " + www.downloadHandler.text);
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(www.error))
+            {
+                result(www.error + " : " + www.downloadHandler.text);
+            }
+            else
+            {
+                result(www.downloadHandler.text);
+            }
+        }
+    }
+
 }
+
+

@@ -294,6 +294,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PersonGroupId: visitors
   m_PersonInGroup: Sonny
+  m_ImageFolderPath: Assets/App/Resources/Train
+  m_TestImagepath: Assets/App/Resources/Test
 --- !u!4 &1411851272
 Transform:
   m_ObjectHideFlags: 0
