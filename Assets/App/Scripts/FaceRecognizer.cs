@@ -20,6 +20,8 @@ public class FaceRecognizer : MonoBehaviour
     [SerializeField]
     string m_TestImagepath;
 
+    string m_OutputPath = "Assets/App/Resources/";
+
     // Start is called before the first frame update
     IEnumerator Start()
     {
@@ -105,6 +107,15 @@ public class FaceRecognizer : MonoBehaviour
                         yield return RequestManager.Identify(m_PersonGroupId, face, value => identifyFaces = value);
                         Debug.Log("Response from identifyFaces : " + identifyFaces);
 
+                        IdentifiedFaces.IdentifiedFacesResponse[] idFaces = JsonHelper.getJsonArray<IdentifiedFaces.IdentifiedFacesResponse>(identifyFaces);
+
+                        StreamWriter writer = new StreamWriter(m_OutputPath + "output" + i + ".json", true);
+                        writer.WriteLine(identifyFaces);
+                        writer.Close();
+
+                        StreamWriter faces = new StreamWriter(m_OutputPath + "faces" + i + ".json", true);
+                        faces.WriteLine(detectFaces);
+                        faces.Close();
 
                     }
 
