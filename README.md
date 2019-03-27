@@ -15,3 +15,6 @@ The detection results are returned as JSON and currently there are no visualizat
 One way to visualize the result is use another library such as OpenCV and feed the detected Rect in the JSON.
 ### Scripts
 Assets/App/Scripts contain all the scripts for this project. FaceRecognizer.cs is the main script, but the wrapper methods for the HTTP calls to the Face API can be found in RequestManager.cs. Other scripts are just JSON definitions to retrieve the various responses from the Face API.
+
+### Unity Packman
+This repository uses [Unity Packman](https://www.npmjs.com/package/unity-packman) to enable other repositories to import the scripts in this project. Currently the scripts under Assets/Scripts/Common will be exported.
