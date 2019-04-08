@@ -104,8 +104,15 @@ public static class RequestManager
             }
             else
             {
-                Debug.Log(":\nReceived: " + www.downloadHandler.text);
-                result(true);
+                if (!string.IsNullOrEmpty(www.error))
+                {
+                    Debug.Log(www.error);
+                    result(false);
+                }
+                else
+                {
+                    result(true);
+                }
             }
         }
     }

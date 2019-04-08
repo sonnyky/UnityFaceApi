@@ -35,6 +35,7 @@ public class FaceRecognizer : MonoBehaviour
     {
         if (ENV_KEY.Equals("None")){
             Debug.LogError("No environment variable key is defined. Stopping.");
+            yield break;
         }
 
         GetApiKey();
@@ -52,8 +53,18 @@ public class FaceRecognizer : MonoBehaviour
             yield return RequestManager.GetPersonListInGroup(ENDPOINT, API_KEY, m_PersonGroupId, value => firstPersonId = value);
             PersonInGroup.Person[] firstPersonJson = JsonHelper.getJsonArray<PersonInGroup.Person>(firstPersonId);
 
-            if (firstPersonJson[0].personId != null)
+            if (firstPersonJson.Length  > 0 && firstPersonJson[0].personId != null)
             {
+                // Check if the target person exists in the list
+                bool personFound = false;
+                for(int i=0; i<firstPersonJson.Length; i++)
+                {
+                    Debug.Log("name : "  + firstPersonJson[i].name);
+                    if (firstPersonJson[i].name.Equals(m_PersonInGroup)) personFound = true;
+                }
+
+                if(!personFound) yield break;
+
                 string id = firstPersonJson[0].personId;
                 Debug.Log("Person found in group with person Id : " + id);
                 
@@ -92,7 +103,7 @@ public class FaceRecognizer : MonoBehaviour
                     yield return RequestManager.TrainPersonGroup(ENDPOINT, API_KEY, m_PersonGroupId, value => trainPersonGroupResult = value);
                     if(trainPersonGroupResult == "")
                     {
-                        Debug.Log("Training success");
+                        Debug.Log("Training success. Stop and restart app to try identification.");
                     }
 
                 }
@@ -144,7 +155,7 @@ public class FaceRecognizer : MonoBehaviour
 
                 if (personCreated)
                 {
-                    Debug.Log("Successfully created Person in Group");
+                    Debug.Log("Successfully created Person in Group. Stop and restart app to try identification");
                 }
                 else
                 {
@@ -161,11 +172,11 @@ public class FaceRecognizer : MonoBehaviour
 
             if (createSucceded)
             {
-                Debug.Log("Successfully created Person Group");
+                Debug.Log("Successfully created Person Group. Stop and restart app to try performing identification");
             }
             else
             {
-                Debug.Log("Failed to create Person Group");
+                Debug.Log("Failed to create Person Group. Something went wrong. Please debug.");
             }
 
 
