@@ -25,7 +25,10 @@ public class FaceRecognizer : MonoBehaviour
     [SerializeField]
     string ENV_KEY = "None";
 
-    string API_KEY = "None";
+    [SerializeField]
+    string ENDPOINT = "Default";
+
+    string API_KEY;
 
     // Start is called before the first frame update
     IEnumerator Start()
@@ -34,9 +37,11 @@ public class FaceRecognizer : MonoBehaviour
             Debug.LogError("No environment variable key is defined. Stopping.");
         }
 
+        GetApiKey();
+
         // Check if the person group ID already exists
         bool requestSucceded = false;
-        yield return RequestManager.GetPersonGroup(API_KEY, m_PersonGroupId, value => requestSucceded = value );
+        yield return RequestManager.GetPersonGroup(ENDPOINT, API_KEY, m_PersonGroupId, value => requestSucceded = value );
 
         if (requestSucceded)
         {
@@ -44,7 +49,7 @@ public class FaceRecognizer : MonoBehaviour
 
             // Check if the target person is already created. We only need one person for this demo.
             string firstPersonId = "Unknown";
-            yield return RequestManager.GetPersonListInGroup(API_KEY, m_PersonGroupId, value => firstPersonId = value);
+            yield return RequestManager.GetPersonListInGroup(ENDPOINT, API_KEY, m_PersonGroupId, value => firstPersonId = value);
             PersonInGroup.Person[] firstPersonJson = JsonHelper.getJsonArray<PersonInGroup.Person>(firstPersonId);
 
             if (firstPersonJson[0].personId != null)
@@ -54,7 +59,7 @@ public class FaceRecognizer : MonoBehaviour
                 
                 // Get training status of the person group
                 string trainingStatus = "Unknown";
-                yield return RequestManager.GetPersonGroupTrainingStatus(API_KEY, m_PersonGroupId, value => trainingStatus = value);
+                yield return RequestManager.GetPersonGroupTrainingStatus(ENDPOINT, API_KEY, m_PersonGroupId, value => trainingStatus = value);
                 Error.ErrorResponse res_error = JsonUtility.FromJson<Error.ErrorResponse>(trainingStatus);
                 Debug.Log(res_error.error.code);
 
@@ -66,7 +71,7 @@ public class FaceRecognizer : MonoBehaviour
                     for(int i=0; i<imageFiles.Length; i++)
                     {
                         string response = "Unknown";
-                        yield return RequestManager.DetectFaces(API_KEY, m_ImageFolderPath + "/me" + (i+1) +  ".jpg", value => response = value);
+                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, m_ImageFolderPath + "/me" + (i+1) +  ".jpg", value => response = value);
                         Debug.Log("Response from DetectFaces : " + response);
                         FacesBasic.FacesDetectionResponse[] face = JsonHelper.getJsonArray<FacesBasic.FacesDetectionResponse>(response);
 
@@ -76,7 +81,7 @@ public class FaceRecognizer : MonoBehaviour
                             // Add face to person in group
                             string faceRect = "targetFace=" + face[0].rect.left + "," + face[0].rect.top + "," + face[0].rect.width + "," + face[0].rect.height;
                             string addFaceResponse = "Unknown";
-                            yield return RequestManager.AddFaceToPersonInGroup(API_KEY, m_PersonGroupId, id,  m_ImageFolderPath + "/me" + (i + 1) + ".jpg",faceRect,  value => addFaceResponse = value);
+                            yield return RequestManager.AddFaceToPersonInGroup(ENDPOINT, API_KEY, m_PersonGroupId, id,  m_ImageFolderPath + "/me" + (i + 1) + ".jpg",faceRect,  value => addFaceResponse = value);
                             Debug.Log(addFaceResponse);
 
                         }
@@ -84,7 +89,7 @@ public class FaceRecognizer : MonoBehaviour
 
 
                     string trainPersonGroupResult = "Unknown";
-                    yield return RequestManager.TrainPersonGroup(API_KEY, m_PersonGroupId, value => trainPersonGroupResult = value);
+                    yield return RequestManager.TrainPersonGroup(ENDPOINT, API_KEY, m_PersonGroupId, value => trainPersonGroupResult = value);
                     if(trainPersonGroupResult == "")
                     {
                         Debug.Log("Training success");
@@ -107,13 +112,13 @@ public class FaceRecognizer : MonoBehaviour
                         Debug.Log(testImageFiles[i]);
                         // Detect faces in the test image
                         string detectFaces = "unknown";
-                        yield return RequestManager.DetectFaces(API_KEY, testImageFiles[i], value => detectFaces = value);
+                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, testImageFiles[i], value => detectFaces = value);
                         Debug.Log("Response from DetectFaces : " + detectFaces);
                         FacesBasic.FacesDetectionResponse[] face = JsonHelper.getJsonArray<FacesBasic.FacesDetectionResponse>(detectFaces);
 
                         // Identify faces in the test image
                         string identifyFaces = "unknown";
-                        yield return RequestManager.Identify(API_KEY, m_PersonGroupId, face, value => identifyFaces = value);
+                        yield return RequestManager.Identify(ENDPOINT, API_KEY, m_PersonGroupId, face, value => identifyFaces = value);
                         Debug.Log("Response from identifyFaces : " + identifyFaces);
 
                         IdentifiedFaces.IdentifiedFacesResponse[] idFaces = JsonHelper.getJsonArray<IdentifiedFaces.IdentifiedFacesResponse>(identifyFaces);
@@ -135,7 +140,7 @@ public class FaceRecognizer : MonoBehaviour
             {
                 Debug.Log("Person not found");
                 bool personCreated = false;
-                yield return RequestManager.CreatePersonInGroup(API_KEY, m_PersonGroupId, m_PersonInGroup, "First person", value => personCreated = value);
+                yield return RequestManager.CreatePersonInGroup(ENDPOINT, API_KEY, m_PersonGroupId, m_PersonInGroup, "First person", value => personCreated = value);
 
                 if (personCreated)
                 {
@@ -152,7 +157,7 @@ public class FaceRecognizer : MonoBehaviour
         {
             Debug.Log("Person group ID does not exist. Creating Person Group");
             bool createSucceded = false;
-            yield return RequestManager.CreatePersonGroup(API_KEY, m_PersonGroupId, "ShinMisato", "Visitors who came to our Shin Misato theme park", value => createSucceded = value);
+            yield return RequestManager.CreatePersonGroup(ENDPOINT, API_KEY, m_PersonGroupId, "ShinMisato", "Visitors who came to our Shin Misato theme park", value => createSucceded = value);
 
             if (createSucceded)
             {

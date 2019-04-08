@@ -14,9 +14,9 @@ public static class RequestManager
         public string userData;
     }
 
-    public static IEnumerator CreatePersonGroup(string apiKey, string personGroupId, string name, string userData, System.Action<bool> result) {
+    public static IEnumerator CreatePersonGroup(string endpoint, string apiKey, string personGroupId, string name, string userData, System.Action<bool> result) {
         string parameters = "?subscription-key=" + apiKey;
-        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + parameters;
+        string request = endpoint + "/persongroups/" + personGroupId + parameters;
         string body = "{'name': '" + name + "','userData': '" + userData + "'}";
 
         PersonGroupData data = new PersonGroupData();
@@ -44,9 +44,9 @@ public static class RequestManager
 
     }
 
-    public static IEnumerator CreatePersonInGroup(string apiKey, string personGroupId, string name, string userData, System.Action<bool> result)
+    public static IEnumerator CreatePersonInGroup(string endpoint, string apiKey, string personGroupId, string name, string userData, System.Action<bool> result)
     {
-        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId +"/persons";
+        string request = endpoint + "/persongroups/" + personGroupId +"/persons";
 
         PersonGroupData data = new PersonGroupData();
         data.name = name;
@@ -85,12 +85,15 @@ public static class RequestManager
 
     }
 
-    public static IEnumerator GetPersonGroup(string apiKey, string personGroupId, System.Action<bool> result)
+    public static IEnumerator GetPersonGroup(string endpoint, string apiKey, string personGroupId, System.Action<bool> result)
     {
         string parameters = "?subscription-key=" + apiKey;
-        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + parameters;
+        string request = endpoint + "/persongroups/" + personGroupId + parameters;
 
-        using(UnityWebRequest www = UnityWebRequest.Get(request))
+        Debug.Log("Endpoint is : " + endpoint + " and key is : " + apiKey);
+
+
+        using (UnityWebRequest www = UnityWebRequest.Get(request))
         {
             yield return www.SendWebRequest();
 
@@ -114,10 +117,10 @@ public static class RequestManager
     /// <param name="personId"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public static IEnumerator GetPersonInGroup(string apiKey, string personGroupId, string personId, System.Action<bool> result)
+    public static IEnumerator GetPersonInGroup(string endpoint, string apiKey, string personGroupId, string personId, System.Action<bool> result)
     {
         string parameters = "?subscription-key=" + apiKey;
-        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/persons/" + personId + parameters;
+        string request = endpoint + "/persongroups/" + personGroupId + "/persons/" + personId + parameters;
 
         using (UnityWebRequest www = UnityWebRequest.Get(request))
         {
@@ -143,10 +146,10 @@ public static class RequestManager
         }
     }
 
-    public static IEnumerator GetPersonListInGroup(string apiKey, string personGroupId, System.Action<string> result)
+    public static IEnumerator GetPersonListInGroup(string endpoint, string apiKey, string personGroupId, System.Action<string> result)
     {
         string parameters = "?subscription-key=" + apiKey;
-        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/persons" + parameters;
+        string request = endpoint + "/persongroups/" + personGroupId + "/persons" + parameters;
 
         using (UnityWebRequest www = UnityWebRequest.Get(request))
         {
@@ -175,10 +178,10 @@ public static class RequestManager
     }
 
 
-    public static IEnumerator GetPersonGroupTrainingStatus(string apiKey, string personGroupId, System.Action<string> result)
+    public static IEnumerator GetPersonGroupTrainingStatus(string endpoint, string apiKey, string personGroupId, System.Action<string> result)
     {
         string parameters = "?subscription-key=" + apiKey;
-        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/training" + parameters;
+        string request = endpoint + "/persongroups/" + personGroupId + "/training" + parameters;
 
         using (UnityWebRequest www = UnityWebRequest.Get(request))
         {
@@ -203,9 +206,9 @@ public static class RequestManager
     }
 
 
-    public static IEnumerator DetectFaces(string apiKey, string pathToImage, System.Action<string> result)
+    public static IEnumerator DetectFaces(string endpoint, string apiKey, string pathToImage, System.Action<string> result)
     {
-        string request = Constants.FACE_API_ENDPOINT + "/detect";
+        string request = endpoint + "/detect";
 
         var www = new UnityWebRequest(request, "POST");
         byte[] bodyRaw = File.ReadAllBytes(pathToImage);
@@ -237,9 +240,9 @@ public static class RequestManager
 
     }
 
-    public static IEnumerator AddFaceToPersonInGroup(string apiKey, string personGroupId, string personId,string pathToImage, string targetFace, System.Action<string> result)
+    public static IEnumerator AddFaceToPersonInGroup(string endpoint, string apiKey, string personGroupId, string personId,string pathToImage, string targetFace, System.Action<string> result)
     {
-        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/persons/" + personId + "/persistedFaces" ;
+        string request = endpoint + "/persongroups/" + personGroupId + "/persons/" + personId + "/persistedFaces" ;
         
         var www = new UnityWebRequest(request, "POST");
         byte[] bodyRaw = File.ReadAllBytes(pathToImage);
@@ -269,9 +272,9 @@ public static class RequestManager
     }
 
 
-    public static IEnumerator TrainPersonGroup(string apiKey, string personGroupId, System.Action<string> result)
+    public static IEnumerator TrainPersonGroup(string endpoint, string apiKey, string personGroupId, System.Action<string> result)
     {
-        string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/train";
+        string request = endpoint + "/persongroups/" + personGroupId + "/train";
 
         var www = new UnityWebRequest(request, "POST");
        
@@ -305,9 +308,9 @@ public static class RequestManager
     /// <param name="faceIds"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public static IEnumerator Identify(string apiKey, string personGroupId, FacesBasic.FacesDetectionResponse[] faces, System.Action<string> result)
+    public static IEnumerator Identify(string endpoint, string apiKey, string personGroupId, FacesBasic.FacesDetectionResponse[] faces, System.Action<string> result)
     {
-        string request = Constants.FACE_API_ENDPOINT + "/identify";
+        string request = endpoint + "/identify";
 
 
         // Send the detected faces to identify agains the trained images

@@ -297,6 +297,7 @@ MonoBehaviour:
   m_ImageFolderPath: Assets/App/Resources/Train
   m_TestImagepath: Assets/App/Resources/Test
   ENV_KEY: GREETER_AZURE_FACE_API_KEY
+  ENDPOINT: https://japaneast.api.cognitive.microsoft.com/face/v1.0
 --- !u!4 &1411851272
 Transform:
   m_ObjectHideFlags: 0
