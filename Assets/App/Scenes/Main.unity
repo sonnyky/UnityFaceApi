@@ -296,6 +296,7 @@ MonoBehaviour:
   m_PersonInGroup: Sonny
   m_ImageFolderPath: Assets/App/Resources/Train
   m_TestImagepath: Assets/App/Resources/Test
+  ENV_KEY: GREETER_AZURE_FACE_API_KEY
 --- !u!4 &1411851272
 Transform:
   m_ObjectHideFlags: 0

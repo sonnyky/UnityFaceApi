@@ -14,8 +14,8 @@ public static class RequestManager
         public string userData;
     }
 
-    public static IEnumerator CreatePersonGroup(string personGroupId, string name, string userData, System.Action<bool> result) {
-        string parameters = "?subscription-key=" + Constants.FACE_API_KEY_1;
+    public static IEnumerator CreatePersonGroup(string apiKey, string personGroupId, string name, string userData, System.Action<bool> result) {
+        string parameters = "?subscription-key=" + apiKey;
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + parameters;
         string body = "{'name': '" + name + "','userData': '" + userData + "'}";
 
@@ -44,7 +44,7 @@ public static class RequestManager
 
     }
 
-    public static IEnumerator CreatePersonInGroup(string personGroupId, string name, string userData, System.Action<bool> result)
+    public static IEnumerator CreatePersonInGroup(string apiKey, string personGroupId, string name, string userData, System.Action<bool> result)
     {
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId +"/persons";
 
@@ -59,7 +59,7 @@ public static class RequestManager
         www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
         www.SetRequestHeader("Content-Type", "application/json");
-        www.SetRequestHeader("Ocp-Apim-Subscription-Key", Constants.FACE_API_KEY_1);
+        www.SetRequestHeader("Ocp-Apim-Subscription-Key", apiKey);
 
         yield return www.SendWebRequest();
 
@@ -85,9 +85,9 @@ public static class RequestManager
 
     }
 
-    public static IEnumerator GetPersonGroup(string personGroupId, System.Action<bool> result)
+    public static IEnumerator GetPersonGroup(string apiKey, string personGroupId, System.Action<bool> result)
     {
-        string parameters = "?subscription-key=" + Constants.FACE_API_KEY_1;
+        string parameters = "?subscription-key=" + apiKey;
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + parameters;
 
         using(UnityWebRequest www = UnityWebRequest.Get(request))
@@ -114,9 +114,9 @@ public static class RequestManager
     /// <param name="personId"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public static IEnumerator GetPersonInGroup(string personGroupId, string personId, System.Action<bool> result)
+    public static IEnumerator GetPersonInGroup(string apiKey, string personGroupId, string personId, System.Action<bool> result)
     {
-        string parameters = "?subscription-key=" + Constants.FACE_API_KEY_1;
+        string parameters = "?subscription-key=" + apiKey;
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/persons/" + personId + parameters;
 
         using (UnityWebRequest www = UnityWebRequest.Get(request))
@@ -143,9 +143,9 @@ public static class RequestManager
         }
     }
 
-    public static IEnumerator GetPersonListInGroup(string personGroupId, System.Action<string> result)
+    public static IEnumerator GetPersonListInGroup(string apiKey, string personGroupId, System.Action<string> result)
     {
-        string parameters = "?subscription-key=" + Constants.FACE_API_KEY_1;
+        string parameters = "?subscription-key=" + apiKey;
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/persons" + parameters;
 
         using (UnityWebRequest www = UnityWebRequest.Get(request))
@@ -175,9 +175,9 @@ public static class RequestManager
     }
 
 
-    public static IEnumerator GetPersonGroupTrainingStatus(string personGroupId, System.Action<string> result)
+    public static IEnumerator GetPersonGroupTrainingStatus(string apiKey, string personGroupId, System.Action<string> result)
     {
-        string parameters = "?subscription-key=" + Constants.FACE_API_KEY_1;
+        string parameters = "?subscription-key=" + apiKey;
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/training" + parameters;
 
         using (UnityWebRequest www = UnityWebRequest.Get(request))
@@ -203,7 +203,7 @@ public static class RequestManager
     }
 
 
-    public static IEnumerator DetectFaces(string pathToImage, System.Action<string> result)
+    public static IEnumerator DetectFaces(string apiKey, string pathToImage, System.Action<string> result)
     {
         string request = Constants.FACE_API_ENDPOINT + "/detect";
 
@@ -212,7 +212,7 @@ public static class RequestManager
         www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
         www.SetRequestHeader("Content-Type", "application/octet-stream");
-        www.SetRequestHeader("Ocp-Apim-Subscription-Key", Constants.FACE_API_KEY_1);
+        www.SetRequestHeader("Ocp-Apim-Subscription-Key", apiKey);
 
         yield return www.SendWebRequest();
 
@@ -237,7 +237,7 @@ public static class RequestManager
 
     }
 
-    public static IEnumerator AddFaceToPersonInGroup(string personGroupId, string personId,string pathToImage, string targetFace, System.Action<string> result)
+    public static IEnumerator AddFaceToPersonInGroup(string apiKey, string personGroupId, string personId,string pathToImage, string targetFace, System.Action<string> result)
     {
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/persons/" + personId + "/persistedFaces" ;
         
@@ -246,7 +246,7 @@ public static class RequestManager
         www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
         www.SetRequestHeader("Content-Type", "application/octet-stream");
-        www.SetRequestHeader("Ocp-Apim-Subscription-Key", Constants.FACE_API_KEY_1);
+        www.SetRequestHeader("Ocp-Apim-Subscription-Key", apiKey);
 
         yield return www.SendWebRequest();
 
@@ -269,14 +269,14 @@ public static class RequestManager
     }
 
 
-    public static IEnumerator TrainPersonGroup(string personGroupId, System.Action<string> result)
+    public static IEnumerator TrainPersonGroup(string apiKey, string personGroupId, System.Action<string> result)
     {
         string request = Constants.FACE_API_ENDPOINT + "/persongroups/" + personGroupId + "/train";
 
         var www = new UnityWebRequest(request, "POST");
        
         www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-        www.SetRequestHeader("Ocp-Apim-Subscription-Key", Constants.FACE_API_KEY_1);
+        www.SetRequestHeader("Ocp-Apim-Subscription-Key", apiKey);
 
         yield return www.SendWebRequest();
 
@@ -305,7 +305,7 @@ public static class RequestManager
     /// <param name="faceIds"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public static IEnumerator Identify(string personGroupId, FacesBasic.FacesDetectionResponse[] faces, System.Action<string> result)
+    public static IEnumerator Identify(string apiKey, string personGroupId, FacesBasic.FacesDetectionResponse[] faces, System.Action<string> result)
     {
         string request = Constants.FACE_API_ENDPOINT + "/identify";
 
@@ -331,7 +331,7 @@ public static class RequestManager
         www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
         www.SetRequestHeader("Content-Type", "application/json");
-        www.SetRequestHeader("Ocp-Apim-Subscription-Key", Constants.FACE_API_KEY_1);
+        www.SetRequestHeader("Ocp-Apim-Subscription-Key", apiKey);
 
         yield return www.SendWebRequest();
 
