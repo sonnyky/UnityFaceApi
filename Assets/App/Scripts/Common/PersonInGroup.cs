@@ -8,7 +8,7 @@ public class PersonInGroup : MonoBehaviour
     public class Person
     {
         public string personId;
-        public string persistedFaceIds;
+        public string[] persistedFaceIds;
         public string name;
         public string userData;
     }
