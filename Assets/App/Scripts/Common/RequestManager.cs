@@ -44,7 +44,7 @@ public static class RequestManager
 
     }
 
-    public static IEnumerator CreatePersonInGroup(string endpoint, string apiKey, string personGroupId, string name, string userData, System.Action<bool> result)
+    public static IEnumerator CreatePersonInGroup(string endpoint, string apiKey, string personGroupId, string name, string userData, System.Action<string> result)
     {
         string request = endpoint + "/persongroups/" + personGroupId +"/persons";
 
@@ -68,18 +68,18 @@ public static class RequestManager
         if (www.isNetworkError)
         {
             Debug.Log(" Error: " + www.error);
-            result(false);
+            result(www.error);
         }
         else
         {
             if (!string.IsNullOrEmpty(www.error))
             {
                 Debug.Log(www.error);
-                result(false);
+                result(www.error);
             }
             else
             {
-                result(true);
+                result(www.downloadHandler.text);
             }
         }
 

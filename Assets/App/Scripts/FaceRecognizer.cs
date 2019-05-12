@@ -150,10 +150,10 @@ public class FaceRecognizer : MonoBehaviour
             else
             {
                 Debug.Log("Person not found");
-                bool personCreated = false;
+                string personCreated = "null";
                 yield return RequestManager.CreatePersonInGroup(ENDPOINT, API_KEY, m_PersonGroupId, m_PersonInGroup, "First person", value => personCreated = value);
 
-                if (personCreated)
+                if (!personCreated.Equals("null"))
                 {
                     Debug.Log("Successfully created Person in Group. Stop and restart app to try identification");
                 }
