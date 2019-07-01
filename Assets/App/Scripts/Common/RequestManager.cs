@@ -28,6 +28,8 @@ public static class RequestManager
         using (UnityWebRequest www = UnityWebRequest.Put(request, dataJson))
         {
             www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader("Ocp-Apim-Subscription-Key", apiKey);
+
             yield return www.SendWebRequest();
 
             if(www.isNetworkError || www.isHttpError)
