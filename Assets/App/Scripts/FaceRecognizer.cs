@@ -84,7 +84,7 @@ public class FaceRecognizer : MonoBehaviour
                         string response = "Unknown";
                         yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, m_ImageFolderPath + "/me" + (i+1) +  ".jpg", value => response = value);
                         Debug.Log("Response from DetectFaces : " + response);
-                        FacesBasic.FacesDetectionResponse[] face = JsonHelper.getJsonArray<FacesBasic.FacesDetectionResponse>(response);
+                        FacesBasic.FacesDetectionResponse[] face = Tinker.JsonHelper.getJsonArray<FacesBasic.FacesDetectionResponse>(response);
 
                         // Register the images to the person in person group
                         if (face[0].rect != null)
@@ -125,14 +125,14 @@ public class FaceRecognizer : MonoBehaviour
                         string detectFaces = "unknown";
                         yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, testImageFiles[i], value => detectFaces = value);
                         Debug.Log("Response from DetectFaces : " + detectFaces);
-                        FacesBasic.FacesDetectionResponse[] face = JsonHelper.getJsonArray<FacesBasic.FacesDetectionResponse>(detectFaces);
+                        FacesBasic.FacesDetectionResponse[] face = Tinker.JsonHelper.getJsonArray<FacesBasic.FacesDetectionResponse>(detectFaces);
 
                         // Identify faces in the test image
                         string identifyFaces = "unknown";
                         yield return RequestManager.Identify(ENDPOINT, API_KEY, m_PersonGroupId, face, value => identifyFaces = value);
                         Debug.Log("Response from identifyFaces : " + identifyFaces);
 
-                        IdentifiedFaces.IdentifiedFacesResponse[] idFaces = JsonHelper.getJsonArray<IdentifiedFaces.IdentifiedFacesResponse>(identifyFaces);
+                        IdentifiedFaces.IdentifiedFacesResponse[] idFaces = Tinker.JsonHelper.getJsonArray<IdentifiedFaces.IdentifiedFacesResponse>(identifyFaces);
 
                         StreamWriter writer = new StreamWriter(m_OutputPath + "output" + i + ".json", true);
                         writer.WriteLine(identifyFaces);
