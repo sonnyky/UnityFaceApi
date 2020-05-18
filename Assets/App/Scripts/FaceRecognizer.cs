@@ -69,13 +69,13 @@ public class FaceRecognizer : MonoBehaviour
                 Debug.Log("Person found in group with person Id : " + id);
                 
                 // Get training status of the person group
-                string trainingStatus = "Unknown";
-                yield return RequestManager.GetPersonGroupTrainingStatus(ENDPOINT, API_KEY, m_PersonGroupId, value => trainingStatus = value);
-                Error.ErrorResponse res_error = JsonUtility.FromJson<Error.ErrorResponse>(trainingStatus);
-                Debug.Log(res_error.error.code);
+                Training.TrainingStatus trainingSuccess = new Training.TrainingStatus();
+                Error.ErrorResponse resError = new Error.ErrorResponse();
+                bool trained = false;
+                yield return RequestManager.GetPersonGroupTrainingStatus(ENDPOINT, API_KEY, m_PersonGroupId, res => trained = res, err => resError = err, value => trainingSuccess = value);
 
                 // If not trained the add images and detect faces
-                if (res_error.error.code != null && res_error.error.code.Equals("PersonGroupNotTrained"))
+                if (!trained && resError.error.code != null && resError.error.code.Equals("PersonGroupNotTrained"))
                 {
                     // Get all images in the specified folder and detect the faces rectangles in them.
                     string[] imageFiles = Directory.GetFiles(m_ImageFolderPath, "*.jpg");
@@ -107,14 +107,11 @@ public class FaceRecognizer : MonoBehaviour
                     }
 
                 }
-                else
+                else if(trainingSuccess.status.Equals("succeeded"))
                 // Person Group is already trained
                 {
-                    Training.TrainingStatus status = JsonUtility.FromJson<Training.TrainingStatus>(trainingStatus);
-                    Debug.Log("PersonGroup is already trained");
-                    Debug.Log(status);
-                    //TODO : check success json response
 
+                    Debug.Log("PersonGroup is already trained");
                     // Try to detect face in test image
                     string[] testImageFiles = Directory.GetFiles(m_TestImagepath, "*.jpg");
 

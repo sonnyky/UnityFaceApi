@@ -200,28 +200,38 @@ public static class RequestManager
     }
 
 
-    public static IEnumerator GetPersonGroupTrainingStatus(string endpoint, string apiKey, string personGroupId, System.Action<string> result)
+    public static IEnumerator GetPersonGroupTrainingStatus(string endpoint, string apiKey, string personGroupId, 
+        System.Action<bool> result, System.Action<Error.ErrorResponse> err, System.Action<Training.TrainingStatus> status)
     {
         string parameters = "?subscription-key=" + apiKey;
         string request = endpoint + "/persongroups/" + personGroupId + "/training" + parameters;
-
+        Error.ErrorResponse errorResponse = new Error.ErrorResponse();
+        Training.TrainingStatus statusResponse = new Training.TrainingStatus();
         using (UnityWebRequest www = UnityWebRequest.Get(request))
         {
             yield return www.SendWebRequest();
 
             if (www.isNetworkError)
             {
-                result(www.error);
+                errorResponse.error.message = "Network error";
+                errorResponse.error.code = "Network";
+                err(errorResponse);
+                result(false);
             }
             else
             {
                 if (!string.IsNullOrEmpty(www.error))
                 {
-                    result(www.downloadHandler.text);
+                    // TODO: Catch other errors too
+                    errorResponse = JsonUtility.FromJson<Error.ErrorResponse>(www.error);
+                    err(errorResponse);
+                    result(false);
                 }
                 else
                 {
-                    result(www.downloadHandler.text);
+                    statusResponse = JsonUtility.FromJson<Training.TrainingStatus>(www.downloadHandler.text);
+                    status(statusResponse);
+                    result(true);
                 }
             }
         }
