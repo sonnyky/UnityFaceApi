@@ -155,8 +155,11 @@ public static class RequestManager
         }
     }
 
-    public static IEnumerator GetPersonListInGroup(string endpoint, string apiKey, string personGroupId, System.Action<string> result)
+    public static IEnumerator GetPersonListInGroup(
+        string endpoint, string apiKey, string personGroupId, 
+        System.Action<bool> result, System.Action<List<PersonInGroup.Person>> personList)
     {
+        List<PersonInGroup.Person> temp = new List<PersonInGroup.Person>();
         string parameters = "?subscription-key=" + apiKey;
         string request = endpoint + "/persongroups/" + personGroupId + "/persons" + parameters;
 
@@ -166,24 +169,34 @@ public static class RequestManager
 
             if (www.isNetworkError)
             {
-                Debug.Log(" Error: " + www.error);
-                result(www.error);
+                result(false);
+                personList(temp);
             }
             else
             {
                 if (!string.IsNullOrEmpty(www.error))
                 {
                     Debug.Log(www.error);
-                    result(www.error);
+                    result(false);
+                    personList(temp);
                 }
                 else
                 {
-                    Debug.Log(":\nReceived: " + www.downloadHandler.text);
-                    result(www.downloadHandler.text);
+                    string personListString = www.downloadHandler.text;
+                    if (personListString != null)
+                    {
+                        PersonInGroup.Person[] arrayOfPersons = Tinker.JsonHelper.getJsonArray<PersonInGroup.Person>(personListString);
+                        if(arrayOfPersons.Length > 0)
+                        {
+                            result(true);
+                            temp.AddRange(arrayOfPersons);
+                            personList(temp);
+                        }
+                        else { result(false); personList(temp); }
+                    }
                 }
             }
         }
-
     }
 
 

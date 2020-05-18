@@ -13,6 +13,7 @@ public class FaceRecognizer : MonoBehaviour
     [SerializeField]
     string m_PersonInGroup;
 
+    bool m_PersonListInGroupNotEmpty = false;
 
     [SerializeField]
     string m_ImageFolderPath;
@@ -49,23 +50,22 @@ public class FaceRecognizer : MonoBehaviour
             Debug.Log("Person group ID exists");
 
             // Check if the target person is already created. We only need one person for this demo.
-            string firstPersonId = "Unknown";
-            yield return RequestManager.GetPersonListInGroup(ENDPOINT, API_KEY, m_PersonGroupId, value => firstPersonId = value);
-            PersonInGroup.Person[] firstPersonJson = JsonHelper.getJsonArray<PersonInGroup.Person>(firstPersonId);
+            List<PersonInGroup.Person> personList = new List<PersonInGroup.Person>();
+            yield return RequestManager.GetPersonListInGroup(ENDPOINT, API_KEY, m_PersonGroupId, res => m_PersonListInGroupNotEmpty = res, value => personList = value);
 
-            if (firstPersonJson.Length  > 0 && firstPersonJson[0].personId != null)
+            if (personList.Count  > 0 && personList[0].personId != null)
             {
                 // Check if the target person exists in the list
                 bool personFound = false;
-                for(int i=0; i<firstPersonJson.Length; i++)
+                for(int i=0; i< personList.Count; i++)
                 {
-                    Debug.Log("name : "  + firstPersonJson[i].name);
-                    if (firstPersonJson[i].name.Equals(m_PersonInGroup)) personFound = true;
+                    Debug.Log("name : "  + personList[i].name);
+                    if (personList[i].name.Equals(m_PersonInGroup)) personFound = true;
                 }
 
                 if(!personFound) yield break;
 
-                string id = firstPersonJson[0].personId;
+                string id = personList[0].personId;
                 Debug.Log("Person found in group with person Id : " + id);
                 
                 // Get training status of the person group
