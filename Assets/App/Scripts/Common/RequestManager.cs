@@ -192,7 +192,7 @@ public static class RequestManager
                             temp.AddRange(arrayOfPersons);
                             personList(temp);
                         }
-                        else { result(false); personList(temp); }
+                        else { result(true); personList(temp); }
                     }
                 }
             }
@@ -304,7 +304,7 @@ public static class RequestManager
     }
 
 
-    public static IEnumerator TrainPersonGroup(string endpoint, string apiKey, string personGroupId, System.Action<string> result)
+    public static IEnumerator TrainPersonGroup(string endpoint, string apiKey, string personGroupId, System.Action<bool> result, System.Action<string> error)
     {
         string request = endpoint + "/persongroups/" + personGroupId + "/train";
 
@@ -317,17 +317,20 @@ public static class RequestManager
 
         if (www.isNetworkError)
         {
-            result(www.error);
+            error(www.error);
+            result(false);
         }
         else
         {
             if (!string.IsNullOrEmpty(www.error))
             {
-                result(www.error);
+                error(www.error);
+                result(false);
             }
             else
             {
-                result(www.downloadHandler.text);
+                error(www.downloadHandler.text);
+                result(true);
             }
         }
 

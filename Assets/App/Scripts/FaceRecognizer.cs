@@ -100,8 +100,9 @@ public class FaceRecognizer : MonoBehaviour
 
 
                     string trainPersonGroupResult = "Unknown";
-                    yield return RequestManager.TrainPersonGroup(ENDPOINT, API_KEY, m_PersonGroupId, value => trainPersonGroupResult = value);
-                    if(trainPersonGroupResult == "")
+                    bool trainingResult = false;
+                    yield return RequestManager.TrainPersonGroup(ENDPOINT, API_KEY, m_PersonGroupId, res => trainingResult = res, value => trainPersonGroupResult = value);
+                    if(trainingResult)
                     {
                         Debug.Log("Training success. Stop and restart app to try identification.");
                     }
