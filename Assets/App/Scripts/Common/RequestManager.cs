@@ -303,7 +303,7 @@ public static class RequestManager
 
     }
 
-    public static IEnumerator AddFaceToPersonInGroup(string endpoint, string apiKey, string personGroupId, string personId,string pathToImage, string targetFace, System.Action<string> result)
+    public static IEnumerator AddFaceToPersonInGroup(string endpoint, string apiKey, string personGroupId, string personId,string pathToImage, string targetFace,System.Action<bool> result, System.Action<string> persistedFaceID)
     {
         string request = endpoint + "/persongroups/" + personGroupId + "/persons/" + personId + "/persistedFaces" ;
         
@@ -318,17 +318,20 @@ public static class RequestManager
 
         if (www.isNetworkError)
         {
-            result(www.error);
+            Debug.Log("AddFaceToPersonInGroup error : " + www.error);
+            result(false);
         }
         else
         {
             if (!string.IsNullOrEmpty(www.error))
             {
-                result(www.error);
+                Debug.Log("AddFaceToPersonInGroup error : " + www.error);
+                result(false);
             }
             else
             {
-                result(www.downloadHandler.text);
+                result(true);
+                persistedFaceID(www.downloadHandler.text);
             }
         }
 

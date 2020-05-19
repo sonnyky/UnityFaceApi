@@ -92,7 +92,8 @@ public class FaceRecognizer : MonoBehaviour
                             // Add face to person in group
                             string faceRect = "targetFace=" + face[0].rect.left + "," + face[0].rect.top + "," + face[0].rect.width + "," + face[0].rect.height;
                             string addFaceResponse = "Unknown";
-                            yield return RequestManager.AddFaceToPersonInGroup(ENDPOINT, API_KEY, m_PersonGroupId, id,  m_ImageFolderPath + "/me" + (i + 1) + ".jpg",faceRect,  value => addFaceResponse = value);
+                            bool addFaceSuccess = false;
+                            yield return RequestManager.AddFaceToPersonInGroup(ENDPOINT, API_KEY, m_PersonGroupId, id,  m_ImageFolderPath + "/me" + (i + 1) + ".jpg",faceRect, res => addFaceSuccess = res,  value => addFaceResponse = value);
                             Debug.Log(addFaceResponse);
 
                         }
