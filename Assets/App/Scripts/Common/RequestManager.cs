@@ -241,7 +241,8 @@ public static class RequestManager
     }
 
 
-    public static IEnumerator DetectFaces(string endpoint, string apiKey, string pathToImage, System.Action<string> result)
+    public static IEnumerator DetectFaces(string endpoint, string apiKey, string pathToImage, 
+        System.Action<bool> result, System.Action<List<FacesBasic.FacesDetectionResponse>> data)
     {
         string request = endpoint + "/detect";
 
@@ -258,18 +259,22 @@ public static class RequestManager
 
         if (www.isNetworkError)
         {
-            result(www.error);
+            result(false);
         }
         else
         {
             if (!string.IsNullOrEmpty(www.error))
             {
                 Debug.Log(www.error);
-                result(www.error);
+                result(false);
             }
             else
             {
-                result(www.downloadHandler.text);
+                FacesBasic.FacesDetectionResponse[] face = Tinker.JsonHelper.getJsonArray<FacesBasic.FacesDetectionResponse>(www.downloadHandler.text);
+                List<FacesBasic.FacesDetectionResponse> temp = new List<FacesBasic.FacesDetectionResponse>();
+                temp.AddRange(face);
+                data(temp);
+                result(true);
             }
         }
 
@@ -377,7 +382,8 @@ public static class RequestManager
     /// <param name="faceIds"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public static IEnumerator Identify(string endpoint, string apiKey, string personGroupId, FacesBasic.FacesDetectionResponse[] faces, System.Action<string> result)
+    public static IEnumerator Identify(string endpoint, string apiKey, string personGroupId, FacesBasic.FacesDetectionResponse[] faces, 
+        System.Action<bool> identified,System.Action<string> error, System.Action<List<IdentifiedFaces.IdentifiedFacesResponse>> candidates)
     {
         string request = endpoint + "/identify";
 
@@ -409,17 +415,24 @@ public static class RequestManager
 
         if (www.isNetworkError)
         {
-            result(www.error + " : " + www.downloadHandler.text);
+            identified(false);
+            error(www.error);
         }
         else
         {
             if (!string.IsNullOrEmpty(www.error))
             {
-                result(www.error + " : " + www.downloadHandler.text);
+                identified(false);
+                error(www.error);
             }
             else
             {
-                result(www.downloadHandler.text);
+                IdentifiedFaces.IdentifiedFacesResponse[] idFaces = Tinker.JsonHelper.getJsonArray<IdentifiedFaces.IdentifiedFacesResponse>(www.downloadHandler.text);
+                List<IdentifiedFaces.IdentifiedFacesResponse> temp = new List<IdentifiedFaces.IdentifiedFacesResponse>();
+                temp.AddRange(idFaces);
+                identified(true);
+                candidates(temp);
+                error(www.error);
             }
         }
     }

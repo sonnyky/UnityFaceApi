@@ -81,11 +81,10 @@ public class FaceRecognizer : MonoBehaviour
                     string[] imageFiles = Directory.GetFiles(m_ImageFolderPath, "*.jpg");
                     for(int i=0; i<imageFiles.Length; i++)
                     {
-                        string response = "Unknown";
-                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, m_ImageFolderPath + "/me" + (i+1) +  ".jpg", value => response = value);
-                        Debug.Log("Response from DetectFaces : " + response);
-                        FacesBasic.FacesDetectionResponse[] face = Tinker.JsonHelper.getJsonArray<FacesBasic.FacesDetectionResponse>(response);
-
+                        bool faceFound = false;
+                        List<FacesBasic.FacesDetectionResponse> face = new List<FacesBasic.FacesDetectionResponse>();
+                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, m_ImageFolderPath + "/me" + (i+1) +  ".jpg", res => faceFound = res ,value => face = value);
+                        
                         // Register the images to the person in person group
                         if (face[0].rect != null)
                         {
@@ -121,26 +120,19 @@ public class FaceRecognizer : MonoBehaviour
                     {
                         Debug.Log(testImageFiles[i]);
                         // Detect faces in the test image
-                        string detectFaces = "unknown";
-                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, testImageFiles[i], value => detectFaces = value);
-                        Debug.Log("Response from DetectFaces : " + detectFaces);
-                        FacesBasic.FacesDetectionResponse[] face = Tinker.JsonHelper.getJsonArray<FacesBasic.FacesDetectionResponse>(detectFaces);
+                        bool faceFound = false;
+                        List<FacesBasic.FacesDetectionResponse> face = new List<FacesBasic.FacesDetectionResponse>();
+                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, testImageFiles[i], res => faceFound = res, value => face = value);
 
                         // Identify faces in the test image
-                        string identifyFaces = "unknown";
-                        yield return RequestManager.Identify(ENDPOINT, API_KEY, m_PersonGroupId, face, value => identifyFaces = value);
-                        Debug.Log("Response from identifyFaces : " + identifyFaces);
-
-                        IdentifiedFaces.IdentifiedFacesResponse[] idFaces = Tinker.JsonHelper.getJsonArray<IdentifiedFaces.IdentifiedFacesResponse>(identifyFaces);
-
-                        StreamWriter writer = new StreamWriter(m_OutputPath + "output" + i + ".json", true);
-                        writer.WriteLine(identifyFaces);
-                        writer.Close();
-
-                        StreamWriter faces = new StreamWriter(m_OutputPath + "faces" + i + ".json", true);
-                        faces.WriteLine(detectFaces);
-                        faces.Close();
-
+                        bool identified = false;
+                        List<IdentifiedFaces.IdentifiedFacesResponse> facesList = new List<IdentifiedFaces.IdentifiedFacesResponse>();
+                        string errors = "";
+                        yield return RequestManager.Identify(ENDPOINT, API_KEY, m_PersonGroupId, face.ToArray(), res => identified = res, err =>errors = err, value => facesList = value);
+                        if (identified)
+                        {
+                            Debug.Log(facesList);
+                        }
                     }
 
                 }
