@@ -83,7 +83,10 @@ public class FaceRecognizer : MonoBehaviour
                     {
                         bool faceFound = false;
                         List<FacesBasic.FacesDetectionResponse> face = new List<FacesBasic.FacesDetectionResponse>();
-                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, m_ImageFolderPath + "/me" + (i+1) +  ".jpg", res => faceFound = res ,value => face = value);
+                        byte[] imageByte = File.ReadAllBytes(m_ImageFolderPath + "/me" + (i + 1) + ".jpg");
+                        Texture2D img = new Texture2D(1, 1);
+                        img.LoadImage(imageByte);
+                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, img, res => faceFound = res ,value => face = value);
                         
                         // Register the images to the person in person group
                         if (face[0].rect != null)
@@ -92,7 +95,10 @@ public class FaceRecognizer : MonoBehaviour
                             string faceRect = "targetFace=" + face[0].rect.left + "," + face[0].rect.top + "," + face[0].rect.width + "," + face[0].rect.height;
                             string addFaceResponse = "Unknown";
                             bool addFaceSuccess = false;
-                            yield return RequestManager.AddFaceToPersonInGroup(ENDPOINT, API_KEY, m_PersonGroupId, id,  m_ImageFolderPath + "/me" + (i + 1) + ".jpg",faceRect, res => addFaceSuccess = res,  value => addFaceResponse = value);
+                            byte[] imgByte = File.ReadAllBytes(m_ImageFolderPath + "/me" + (i + 1) + ".jpg");
+                            Texture2D curImg = new Texture2D(1,1);
+                            curImg.LoadImage(imgByte);
+                            yield return RequestManager.AddFaceToPersonInGroup(ENDPOINT, API_KEY, m_PersonGroupId, id, curImg, faceRect, res => addFaceSuccess = res,  value => addFaceResponse = value);
                             Debug.Log(addFaceResponse);
 
                         }
@@ -122,7 +128,10 @@ public class FaceRecognizer : MonoBehaviour
                         // Detect faces in the test image
                         bool faceFound = false;
                         List<FacesBasic.FacesDetectionResponse> face = new List<FacesBasic.FacesDetectionResponse>();
-                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, testImageFiles[i], res => faceFound = res, value => face = value);
+                        byte[] testImgByte = File.ReadAllBytes(testImageFiles[i]);
+                        Texture2D testImg = new Texture2D(1, 1);
+                        testImg.LoadImage(testImgByte);
+                        yield return RequestManager.DetectFaces(ENDPOINT, API_KEY, testImg, res => faceFound = res, value => face = value);
 
                         // Identify faces in the test image
                         bool identified = false;
