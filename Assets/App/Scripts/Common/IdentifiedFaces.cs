@@ -15,6 +15,6 @@ public class IdentifiedFaces : MonoBehaviour
     public class IdentifiedFacesResponse
     {
         public string faceId;
-        public Candidates candidates;
+        public Candidates[] candidates;
     }
 }
