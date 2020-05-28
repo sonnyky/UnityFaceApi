@@ -301,7 +301,7 @@ public static class RequestManager
             }
             else
             {
-                error(www.downloadHandler.text);
+                if(!string.IsNullOrEmpty(www.downloadHandler.text)) error(www.downloadHandler.text);
                 result(true);
             }
         }
@@ -368,7 +368,7 @@ public static class RequestManager
             }
             else
             {
-                error(www.downloadHandler.text);
+                if (!string.IsNullOrEmpty(www.downloadHandler.text)) error(www.downloadHandler.text);
                 result(true);
             }
         }
@@ -432,7 +432,7 @@ public static class RequestManager
                 temp.AddRange(idFaces);
                 identified(true);
                 candidates(temp);
-                error(www.error);
+                if(!string.IsNullOrEmpty(www.error)) error(www.error);
             }
         }
     }
