@@ -308,6 +308,37 @@ public static class RequestManager
 
     }
 
+    public static IEnumerator DeletePersonGroup(string endpoint, string apiKey, string personGroupId,
+        System.Action<bool> result, System.Action<string> error)
+    {
+        string request = endpoint + "/persongroups/" + personGroupId;
+        var www = new UnityWebRequest(request, "DELETE");
+        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+        www.SetRequestHeader("Ocp-Apim-Subscription-Key", apiKey);
+
+        yield return www.SendWebRequest();
+
+        if (www.isNetworkError)
+        {
+            result(false);
+            error(www.error);
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(www.downloadHandler.text))
+            {
+                result(false);
+                error(www.downloadHandler.text);
+            }
+            else
+            {
+                result(true);
+                error("");
+            }
+        }
+
+    }
+
     public static IEnumerator AddFaceToPersonInGroup(string endpoint, string apiKey, string personGroupId, string personId, Texture2D image, string targetFace,System.Action<bool> result, System.Action<string> persistedFaceID)
     {
         string request = endpoint + "/persongroups/" + personGroupId + "/persons/" + personId + "/persistedFaces" ;
